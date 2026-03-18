@@ -9,10 +9,7 @@ Follow these steps in order when creating a new page/route.
 
 ## Prerequisites
 
-Load these expert skills for reference:
-- `.claude/skills/experts/tanstack-router.md`
-- `.claude/skills/experts/tanstack-query.md` (if page fetches data)
-- `.claude/skills/experts/shadcn-ui.md`
+Rules load automatically when touching relevant files (`.claude/rules/react.md`, `.claude/rules/typescript.md`). Follow the patterns defined there.
 
 ## Steps
 

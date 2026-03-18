@@ -68,12 +68,8 @@ Claude automatically routes your requests to the right skill, but you can also r
 | `workflows/new-page.md` | Add a route/page |
 | `workflows/new-feature.md` | Build a complete feature end-to-end |
 | `workflows/new-form.md` | Build a form with validation |
-| `experts/tanstack-router.md` | Working with routing |
-| `experts/tanstack-query.md` | Working with data fetching |
-| `experts/shadcn-ui.md` | Working with UI components |
-| `experts/react-hook-form.md` | Working with forms |
-| `experts/lucide.md` | Working with icons |
-| `experts/testing.md` | Writing tests |
+
+Library-specific patterns (routing, queries, shadcn, forms, icons, testing) are now in `.claude/rules/` — they load automatically when touching relevant files.
 
 ### Plan Execution & Review
 
@@ -97,19 +93,17 @@ vite-spa-tanstack/
 ├── USER_GUIDE.md                      # This file
 ├── .claude/
 │   ├── settings.json                  # Permissions + convention-validation hooks
+│   ├── rules/
+│   │   ├── typescript.md              # TypeScript, imports, Zod, TanStack Query rules
+│   │   ├── react.md                   # React, routing, shadcn, forms, Lucide rules
+│   │   ├── testing.md                 # Testing patterns and common pitfalls
+│   │   └── config.md                  # Vite/environment rules
 │   └── skills/
 │       ├── execute/SKILL.md           # /execute slash command
 │       ├── review-spec/SKILL.md       # /review-spec slash command
 │       ├── phases/
 │       │   ├── 01-setup.md            # 8-phase project scaffolding
 │       │   └── 02-architecture.md     # Folder structure & conventions
-│       ├── experts/
-│       │   ├── tanstack-router.md     # Routing patterns
-│       │   ├── tanstack-query.md      # Data fetching patterns
-│       │   ├── shadcn-ui.md           # UI component patterns
-│       │   ├── react-hook-form.md     # Form patterns
-│       │   ├── lucide.md              # Icon patterns
-│       │   └── testing.md            # Testing patterns
 │       └── workflows/
 │           ├── new-page.md            # Add a route/page
 │           ├── new-feature.md         # Build a complete feature
@@ -120,9 +114,9 @@ vite-spa-tanstack/
 
 1. **CLAUDE.md** is loaded automatically when Claude Code opens the project. It declares the stack, sets global conventions, and routes Claude to the right skill based on what you're doing.
 
-2. **Expert skills** contain baked-in patterns for each library plus instructions to verify against live docs via context7 MCP before generating code.
+2. **Rules** (`.claude/rules/`) contain DO/DON'T code patterns for each library, scoped by file type. They load automatically when Claude touches matching files — no invocation needed. Includes React 19 patterns (Suspense, ErrorBoundary, `use` hook, `useTransition`/`useDeferredValue` with TanStack Query).
 
-3. **Workflow skills** orchestrate multiple experts for multi-step tasks (e.g., building a feature involves routing + queries + UI + testing).
+3. **Workflow skills** orchestrate multi-step tasks (e.g., building a feature involves routing + queries + UI + testing). Rules provide the patterns; workflows provide the procedure.
 
 4. **Convention hooks** in `settings.json` automatically validate that generated code follows the stack's patterns — route files use `createFileRoute`, query files use `queryOptions()`, test files use React Testing Library.
 

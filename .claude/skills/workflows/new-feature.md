@@ -9,12 +9,7 @@ Follow these steps in order when building a new feature end-to-end.
 
 ## Prerequisites
 
-Load these expert skills for reference:
-- `.claude/skills/experts/tanstack-router.md`
-- `.claude/skills/experts/tanstack-query.md`
-- `.claude/skills/experts/shadcn-ui.md`
-- `.claude/skills/experts/react-hook-form.md` (if feature has forms)
-- `.claude/skills/experts/testing.md`
+Rules load automatically when touching relevant files (`.claude/rules/react.md`, `.claude/rules/typescript.md`, `.claude/rules/testing.md`). Follow the patterns defined there.
 
 Use **superpowers TDD** workflow if available.
 
