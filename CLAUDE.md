@@ -38,7 +38,7 @@ This project uses the following stack. Always verify APIs against context7 befor
 
 | Library               | context7 ID                           | Purpose                      |
 | --------------------- | ------------------------------------- | ---------------------------- |
-| React                 | —                                     | UI library                   |
+| React 19+             | —                                     | UI library                   |
 | Vite                  | `/vitejs/vite`                        | Build tool + dev server      |
 | TypeScript            | —                                     | Type safety                  |
 | TanStack Router       | `/tanstack/router`                    | File-based routing           |
@@ -46,9 +46,10 @@ This project uses the following stack. Always verify APIs against context7 befor
 | shadcn/ui             | `/shadcn/ui`                          | UI component library         |
 | Lucide React          | `/websites/lucide_dev_guide_packages` | Icons                        |
 | react-hook-form       | `/react-hook-form/documentation`      | Form management              |
-| Zod                   | —                                     | Schema validation            |
+| Zod                   | `/colinhacks/zod`                     | Schema validation            |
 | Vitest                | `/vitest-dev/vitest`                  | Testing framework            |
-| React Testing Library | —                                     | Component testing            |
+| react-error-boundary  | —                                     | Error boundary component     |
+| React Testing Library | `/websites/testing-library`            | Component testing            |
 
 **Context7 usage:** Before generating code that uses any library with a context7 ID above, call `mcp__context7__query-docs` with that ID to verify current API signatures. If context7 is unreachable, fall back to the baked-in patterns in rules and warn the user.
 
@@ -67,7 +68,7 @@ This project uses the following stack. Always verify APIs against context7 befor
 - **Forms:** react-hook-form + Zod resolver, always. Types inferred via `z.infer<>`, never duplicated.
 - **Tests:** Colocated (`Component.test.tsx` next to `Component.tsx`), Vitest + React Testing Library
 - **State:** React context + `useReducer` for client/UI state. TanStack Query for server state. No additional state libraries.
-- **Env vars:** `import.meta.env` with Vite's `VITE_` prefix. `.env` for local config, never commit secrets.
+- **Env vars:** Validated through `src/lib/env.ts` (Zod schema). `VITE_` prefix required. Never access `import.meta.env` directly — always import from `@/lib/env`. `.env` for local config, never commit secrets.
 - **API client:** Typed fetch wrapper in `src/lib/api.ts` — single source for base URL, auth headers, error handling. All `queryFn`/`mutationFn` call through this.
 - **Navigation:** TanStack Router `<Link>` for declarative, `useNavigate` for programmatic. Never `window.location`.
 - **Package manager:** `npm` by default. If dropped into existing project, detect lock files (`pnpm-lock.yaml` → pnpm, `yarn.lock` → yarn, `package-lock.json` → npm).
@@ -98,6 +99,7 @@ Based on what you're doing, invoke the appropriate skill:
 | "Create a page" / "add a route"          | `.claude/skills/workflows/new-page.md`     |
 | "Build a feature" / "add [feature]"      | `.claude/skills/workflows/new-feature.md`  |
 | "Build a form" / "add a form"            | `.claude/skills/workflows/new-form.md`     |
+| "Add a component" / shared component     | `.claude/skills/workflows/new-component.md`|
 | Understanding project structure          | `.claude/skills/phases/02-architecture.md` |
 
 Library-specific patterns (routing, queries, shadcn, forms, icons, testing) are in `.claude/rules/` — they load automatically when touching relevant files. Skills are for workflows and procedures only.

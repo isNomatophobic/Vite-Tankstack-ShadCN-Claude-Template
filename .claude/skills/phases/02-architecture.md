@@ -40,7 +40,8 @@ src/
 ├── hooks/                     # Shared custom hooks (not feature-specific)
 │
 └── test/                      # Test infrastructure
-    └── setup.ts               # Vitest setup (imports jest-dom, etc.)
+    ├── setup.ts               # Vitest setup (imports jest-dom, etc.)
+    └── test-utils.tsx          # Custom render with providers (renderWithProviders)
 ```
 
 ## Naming Conventions

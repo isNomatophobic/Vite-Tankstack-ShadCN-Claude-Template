@@ -29,8 +29,8 @@ Only test infrastructure lives in `src/test/`:
 
 ```tsx
 // src/test/test-utils.tsx
-import { render, type RenderOptions } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, type RenderOptions } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 function createTestQueryClient() {
   return new QueryClient({
@@ -38,27 +38,27 @@ function createTestQueryClient() {
       queries: { retry: false, gcTime: 0 },
       mutations: { retry: false },
     },
-  });
+  })
 }
 
 export function renderWithProviders(
   ui: React.ReactElement,
   options?: Omit<RenderOptions, 'wrapper'>,
 ) {
-  const queryClient = createTestQueryClient();
+  const queryClient = createTestQueryClient()
 
   function Wrapper({ children }: { children: React.ReactNode }) {
     return (
       <QueryClientProvider client={queryClient}>
         {children}
       </QueryClientProvider>
-    );
+    )
   }
 
   return {
     ...render(ui, { wrapper: Wrapper, ...options }),
     queryClient,
-  };
+  }
 }
 ```
 
@@ -74,12 +74,12 @@ Always use the most accessible query:
 
 ```tsx
 // GOOD
-screen.getByRole('button', { name: /submit/i });
-screen.getByRole('heading', { name: /welcome/i });
-screen.getByLabelText(/email/i);
+screen.getByRole('button', { name: /submit/i })
+screen.getByRole('heading', { name: /welcome/i })
+screen.getByLabelText(/email/i)
 
 // BAD — only if no accessible query works
-screen.getByTestId('submit-button');
+screen.getByTestId('submit-button')
 ```
 
 ## User Events
@@ -87,11 +87,11 @@ screen.getByTestId('submit-button');
 Always `userEvent` over `fireEvent`:
 
 ```tsx
-import userEvent from '@testing-library/user-event';
+import userEvent from '@testing-library/user-event'
 
-const user = userEvent.setup();
-await user.type(screen.getByLabelText(/email/i), 'test@example.com');
-await user.click(screen.getByRole('button', { name: /sign in/i }));
+const user = userEvent.setup()
+await user.type(screen.getByLabelText(/email/i), 'test@example.com')
+await user.click(screen.getByRole('button', { name: /sign in/i }))
 ```
 
 ## Async Content
@@ -99,7 +99,7 @@ await user.click(screen.getByRole('button', { name: /sign in/i }));
 Use `findBy` — never `getBy` + `waitFor` when `findBy` works:
 
 ```tsx
-const name = await screen.findByText('John');
+const name = await screen.findByText('John')
 ```
 
 ## What to Test
@@ -120,16 +120,16 @@ const name = await screen.findByText('John');
 ```tsx
 // ❌ Causes "not wrapped in act()" warning — state update after test ends
 test('loads data', () => {
-  renderWithProviders(<UserProfile />);
-  expect(screen.getByText('Loading')).toBeInTheDocument();
+  renderWithProviders(<UserProfile />)
+  expect(screen.getByText('Loading')).toBeInTheDocument()
   // Test ends while query is still fetching — state updates after unmount
-});
+})
 
 // ✅ Wait for the async operation to complete
 test('loads data', async () => {
-  renderWithProviders(<UserProfile />);
-  expect(await screen.findByText('John')).toBeInTheDocument();
-});
+  renderWithProviders(<UserProfile />)
+  expect(await screen.findByText('John')).toBeInTheDocument()
+})
 ```
 
 ### 2. Not Awaiting userEvent
@@ -137,19 +137,19 @@ test('loads data', async () => {
 ```tsx
 // ❌ Missing await — event hasn't fired when assertion runs
 test('clicks button', () => {
-  const user = userEvent.setup();
-  renderWithProviders(<Counter />);
-  user.click(screen.getByRole('button')); // ❌ not awaited
-  expect(screen.getByText('1')).toBeInTheDocument(); // fails
-});
+  const user = userEvent.setup()
+  renderWithProviders(<Counter />)
+  user.click(screen.getByRole('button')) // ❌ not awaited
+  expect(screen.getByText('1')).toBeInTheDocument() // fails
+})
 
 // ✅ Always await userEvent calls
 test('clicks button', async () => {
-  const user = userEvent.setup();
-  renderWithProviders(<Counter />);
-  await user.click(screen.getByRole('button'));
-  expect(screen.getByText('1')).toBeInTheDocument();
-});
+  const user = userEvent.setup()
+  renderWithProviders(<Counter />)
+  await user.click(screen.getByRole('button'))
+  expect(screen.getByText('1')).toBeInTheDocument()
+})
 ```
 
 ### 3. Testing Suspense Components
@@ -157,8 +157,8 @@ test('clicks button', async () => {
 ```tsx
 // ❌ Missing Suspense wrapper — throws error
 test('renders post', async () => {
-  renderWithProviders(<PostsList />); // ❌ useSuspenseQuery needs Suspense boundary
-});
+  renderWithProviders(<PostsList />) // ❌ useSuspenseQuery needs Suspense boundary
+})
 
 // ✅ Wrap in Suspense + provide fallback
 test('renders post list', async () => {
@@ -166,20 +166,20 @@ test('renders post list', async () => {
     <Suspense fallback={<div>Loading...</div>}>
       <PostsList />
     </Suspense>
-  );
-  expect(await screen.findByText('Test Post')).toBeInTheDocument();
-});
+  )
+  expect(await screen.findByText('Test Post')).toBeInTheDocument()
+})
 ```
 
 ### 4. Testing ErrorBoundary
 
 ```tsx
-import { QueryErrorResetBoundary } from '@tanstack/react-query';
-import { ErrorBoundary } from 'react-error-boundary';
+import { QueryErrorResetBoundary } from '@tanstack/react-query'
+import { ErrorBoundary } from 'react-error-boundary'
 
 test('shows error fallback on query failure', async () => {
   // Mock API to reject
-  vi.spyOn(api, 'get').mockRejectedValueOnce(new Error('Network error'));
+  vi.spyOn(api, 'get').mockRejectedValueOnce(new Error('Network error'))
 
   renderWithProviders(
     <QueryErrorResetBoundary>
@@ -196,31 +196,31 @@ test('shows error fallback on query failure', async () => {
         </ErrorBoundary>
       )}
     </QueryErrorResetBoundary>
-  );
+  )
 
-  expect(await screen.findByText('Error')).toBeInTheDocument();
-});
+  expect(await screen.findByText('Error')).toBeInTheDocument()
+})
 ```
 
 ### 5. QueryClient Leaking Between Tests
 
 ```tsx
 // ❌ Shared QueryClient — cache leaks between tests
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 test('test A', () => {
-  renderWithProviders(<Component />, { queryClient }); // ❌ same client
-});
+  renderWithProviders(<Component />, { queryClient }) // ❌ same client
+})
 test('test B', () => {
-  renderWithProviders(<Component />, { queryClient }); // ❌ gets cached data from test A
-});
+  renderWithProviders(<Component />, { queryClient }) // ❌ gets cached data from test A
+})
 
 // ✅ renderWithProviders creates a fresh QueryClient per test (see implementation above)
 // If you need to pre-seed cache, use the returned queryClient:
 test('renders with data', () => {
-  const { queryClient } = renderWithProviders(<Component />);
-  queryClient.setQueryData(['key'], mockData);
-});
+  const { queryClient } = renderWithProviders(<Component />)
+  queryClient.setQueryData(['key'], mockData)
+})
 ```
 
 ### 6. waitFor Timeout — Test Hangs Then Fails
@@ -228,8 +228,8 @@ test('renders with data', () => {
 ```tsx
 // ❌ Assertion never becomes true — waitFor times out after 1000ms
 await waitFor(() => {
-  expect(screen.getByText('Data loaded')).toBeInTheDocument();
-});
+  expect(screen.getByText('Data loaded')).toBeInTheDocument()
+})
 
 // Common causes:
 // - API mock not set up correctly — query never resolves
@@ -237,10 +237,10 @@ await waitFor(() => {
 // - Missing provider — component silently fails
 
 // ✅ Debug: check what rendered
-screen.debug(); // prints current DOM to console
+screen.debug() // prints current DOM to console
 
 // ✅ Or use findBy instead (includes built-in waitFor)
-expect(await screen.findByText('Data loaded')).toBeInTheDocument();
+expect(await screen.findByText('Data loaded')).toBeInTheDocument()
 ```
 
 ### 7. Mocking API Calls
@@ -252,19 +252,19 @@ vi.mock('@/lib/api', () => ({
     get: vi.fn(),
     post: vi.fn(),
   },
-}));
+}))
 
-import { api } from '@/lib/api';
+import { api } from '@/lib/api'
 
 beforeEach(() => {
   vi.mocked(api.get).mockResolvedValue([
     { id: '1', title: 'Test Post', body: 'Content' },
-  ]);
-});
+  ])
+})
 
 afterEach(() => {
-  vi.restoreAllMocks();
-});
+  vi.restoreAllMocks()
+})
 ```
 
 ### 8. Testing Loading States
@@ -272,39 +272,39 @@ afterEach(() => {
 ```tsx
 test('shows loading skeleton', () => {
   // Don't resolve the API call — keep it pending
-  vi.mocked(api.get).mockReturnValue(new Promise(() => {})); // never resolves
+  vi.mocked(api.get).mockReturnValue(new Promise(() => {})) // never resolves
 
   renderWithProviders(
     <Suspense fallback={<div data-testid="skeleton">Loading</div>}>
       <PostsList />
     </Suspense>
-  );
+  )
 
-  expect(screen.getByTestId('skeleton')).toBeInTheDocument();
-});
+  expect(screen.getByTestId('skeleton')).toBeInTheDocument()
+})
 ```
 
 ### 9. Testing Custom Hooks
 
 ```tsx
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react'
 
 test('useCreatePost calls API and invalidates cache', async () => {
   const wrapper = ({ children }) => (
     <QueryClientProvider client={createTestQueryClient()}>
       {children}
     </QueryClientProvider>
-  );
+  )
 
-  const { result } = renderHook(() => useCreatePost(), { wrapper });
+  const { result } = renderHook(() => useCreatePost(), { wrapper })
 
-  result.current.mutate({ title: 'New Post', body: 'Content' });
+  result.current.mutate({ title: 'New Post', body: 'Content' })
 
   await waitFor(() => {
-    expect(result.current.isSuccess).toBe(true);
-  });
-  expect(api.post).toHaveBeenCalledWith('/posts', { title: 'New Post', body: 'Content' });
-});
+    expect(result.current.isSuccess).toBe(true)
+  })
+  expect(api.post).toHaveBeenCalledWith('/posts', { title: 'New Post', body: 'Content' })
+})
 ```
 
 ### 10. Cleanup — Avoid Memory Leaks
@@ -316,16 +316,16 @@ test('useCreatePost calls API and invalidates cache', async () => {
 
 // ❌ Manual timer cleanup forgotten
 test('debounced search', async () => {
-  vi.useFakeTimers();
-  renderWithProviders(<SearchInput />);
+  vi.useFakeTimers()
+  renderWithProviders(<SearchInput />)
   // ... test ...
-  vi.useRealTimers(); // ❌ if test fails before this line, timers leak
-});
+  vi.useRealTimers() // ❌ if test fails before this line, timers leak
+})
 
 // ✅ Use afterEach for cleanup
 afterEach(() => {
-  vi.useRealTimers();
-});
+  vi.useRealTimers()
+})
 ```
 
 ---
@@ -333,65 +333,65 @@ afterEach(() => {
 ## Example: Component Test
 
 ```tsx
-import { describe, it, expect, vi } from 'vitest';
-import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '@/test/test-utils';
-import { PostCard } from './PostCard';
+import { describe, it, expect, vi } from 'vitest'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { renderWithProviders } from '@/test/test-utils'
+import { PostCard } from './PostCard'
 
 describe('PostCard', () => {
-  const mockPost = { id: '1', title: 'Test Post', body: 'Test body' };
+  const mockPost = { id: '1', title: 'Test Post', body: 'Test body' }
 
   it('renders post title and body', () => {
-    renderWithProviders(<PostCard post={mockPost} />);
-    expect(screen.getByRole('heading', { name: /test post/i })).toBeInTheDocument();
-    expect(screen.getByText(/test body/i)).toBeInTheDocument();
-  });
+    renderWithProviders(<PostCard post={mockPost} />)
+    expect(screen.getByRole('heading', { name: /test post/i })).toBeInTheDocument()
+    expect(screen.getByText(/test body/i)).toBeInTheDocument()
+  })
 
   it('calls onDelete when delete button is clicked', async () => {
-    const user = userEvent.setup();
-    const onDelete = vi.fn();
-    renderWithProviders(<PostCard post={mockPost} onDelete={onDelete} />);
-    await user.click(screen.getByRole('button', { name: /delete/i }));
-    expect(onDelete).toHaveBeenCalledWith('1');
-  });
-});
+    const user = userEvent.setup()
+    const onDelete = vi.fn()
+    renderWithProviders(<PostCard post={mockPost} onDelete={onDelete} />)
+    await user.click(screen.getByRole('button', { name: /delete/i }))
+    expect(onDelete).toHaveBeenCalledWith('1')
+  })
+})
 ```
 
 ## Example: Form Validation Test
 
 ```tsx
-import { describe, it, expect, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '@/test/test-utils';
-import { LoginForm } from './LoginForm';
+import { describe, it, expect, vi } from 'vitest'
+import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { renderWithProviders } from '@/test/test-utils'
+import { LoginForm } from './LoginForm'
 
 describe('LoginForm', () => {
   it('shows validation errors for invalid input', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<LoginForm onSubmit={vi.fn()} />);
-    await user.click(screen.getByRole('button', { name: /sign in/i }));
+    const user = userEvent.setup()
+    renderWithProviders(<LoginForm onSubmit={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: /sign in/i }))
     await waitFor(() => {
-      expect(screen.getByText(/invalid email/i)).toBeInTheDocument();
-    });
-  });
+      expect(screen.getByText(/invalid email/i)).toBeInTheDocument()
+    })
+  })
 
   it('submits with valid data', async () => {
-    const user = userEvent.setup();
-    const onSubmit = vi.fn();
-    renderWithProviders(<LoginForm onSubmit={onSubmit} />);
-    await user.type(screen.getByLabelText(/email/i), 'valid@email.com');
-    await user.type(screen.getByLabelText(/password/i), 'password123');
-    await user.click(screen.getByRole('button', { name: /sign in/i }));
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+    renderWithProviders(<LoginForm onSubmit={onSubmit} />)
+    await user.type(screen.getByLabelText(/email/i), 'valid@email.com')
+    await user.type(screen.getByLabelText(/password/i), 'password123')
+    await user.click(screen.getByRole('button', { name: /sign in/i }))
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith({
         email: 'valid@email.com',
         password: 'password123',
-      });
-    });
-  });
-});
+      })
+    })
+  })
+})
 ```
 
 ---

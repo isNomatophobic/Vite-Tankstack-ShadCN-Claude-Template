@@ -56,12 +56,12 @@ Configure `tsconfig.json` — add path aliases:
 
 Configure `vite.config.ts` — add path alias resolution:
 ```typescript
-import path from "path"
+import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
   // ... existing config
@@ -109,7 +109,7 @@ Create `QueryClient` with defaults and wrap the app with `QueryClientProvider` i
 
 Verify: App still runs with devtools visible in browser.
 
-## Phase 5 — shadcn/ui + Lucide + Tailwind
+## Phase 5 — shadcn/ui + Lucide + Tailwind + Error Boundaries
 
 ```bash
 npx shadcn@latest init -t vite
@@ -120,7 +120,7 @@ Follow the CLI prompts. Then verify/update `components.json`:
 - `aliases` should use `@/` paths matching tsconfig
 
 ```bash
-npm install lucide-react
+npm install lucide-react react-error-boundary
 ```
 
 **CHECKPOINT:** Install a test component (`npx shadcn@latest add button`), import it somewhere, verify it renders. Then remove the test usage (keep the component installed).

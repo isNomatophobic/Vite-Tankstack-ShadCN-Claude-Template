@@ -20,26 +20,26 @@ mcp__context7__query-docs("/websites/lucide_dev_guide_packages", "<icon search o
 
 ```tsx
 // Derived state — compute during render
-const fullName = `${user.firstName} ${user.lastName}`;
+const fullName = `${user.firstName} ${user.lastName}`
 
 // Server data — use TanStack Query
-const { data } = useQuery(userQueryOptions(id));
+const { data } = useQuery(userQueryOptions(id))
 
 // Stable keys from data
 {users.map(user => <UserCard key={user.id} user={user} />)}
 
 // Memoize objects/callbacks passed as props
-const style = useMemo(() => ({ color: theme.primary }), [theme.primary]);
-const handleClick = useCallback((id: string) => selectUser(id), [selectUser]);
+const style = useMemo(() => ({ color: theme.primary }), [theme.primary])
+const handleClick = useCallback((id: string) => selectUser(id), [selectUser])
 
 // When useEffect IS appropriate, always clean up
 useEffect(() => {
   const handler = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') onClose();
-  };
-  window.addEventListener('keydown', handler);
-  return () => window.removeEventListener('keydown', handler);
-}, [onClose]);
+    if (e.key === 'Escape') onClose()
+  }
+  window.addEventListener('keydown', handler)
+  return () => window.removeEventListener('keydown', handler)
+}, [onClose])
 ```
 
 **DON'T:**
@@ -47,20 +47,20 @@ useEffect(() => {
 ```tsx
 // Never useEffect for data fetching
 useEffect(() => {
-  fetch('/api/users').then(r => r.json()).then(setUsers);
-}, []); // ❌ use TanStack Query
+  fetch('/api/users').then(r => r.json()).then(setUsers)
+}, []) // ❌ use TanStack Query
 
 // Never useEffect + useState for derived state
-const [fullName, setFullName] = useState('');
+const [fullName, setFullName] = useState('')
 useEffect(() => {
-  setFullName(`${user.firstName} ${user.lastName}`);
-}, [user]); // ❌ compute during render
+  setFullName(`${user.firstName} ${user.lastName}`)
+}, [user]) // ❌ compute during render
 
 // Never useEffect to sync props to state
-const [localValue, setLocalValue] = useState(props.value);
+const [localValue, setLocalValue] = useState(props.value)
 useEffect(() => {
-  setLocalValue(props.value);
-}, [props.value]); // ❌ use the prop directly
+  setLocalValue(props.value)
+}, [props.value]) // ❌ use the prop directly
 
 // Never use index as key in reorderable lists
 {users.map((user, i) => <UserCard key={i} />)} // ❌ use user.id
@@ -81,21 +81,21 @@ useEffect(() => {
 `use` reads values from Promises or Context. Unlike other hooks, it can be called in conditionals and loops.
 
 ```tsx
-import { use } from 'react';
+import { use } from 'react'
 
 // Conditional context reading (can't do this with useContext)
 function HorizontalRule({ show }: { show: boolean }) {
   if (show) {
-    const theme = use(ThemeContext);
-    return <hr className={theme} />;
+    const theme = use(ThemeContext)
+    return <hr className={theme} />
   }
-  return null;
+  return null
 }
 
 // Reading promises — suspends until resolved
 function Message({ messagePromise }: { messagePromise: Promise<string> }) {
-  const content = use(messagePromise);
-  return <p>{content}</p>;
+  const content = use(messagePromise)
+  return <p>{content}</p>
 }
 ```
 
@@ -104,19 +104,19 @@ function Message({ messagePromise }: { messagePromise: Promise<string> }) {
 ```tsx
 // Never use `use` in try-catch blocks — it breaks Suspense
 try {
-  const data = use(dataPromise); // ❌ Suspense won't work
+  const data = use(dataPromise) // ❌ Suspense won't work
 } catch (e) { ... }
 
 // Never call `use` in event handlers
 function Component({ dataPromise }) {
   function handleClick() {
-    const data = use(dataPromise); // ❌ must be in component body
+    const data = use(dataPromise) // ❌ must be in component body
   }
 }
 
 // Never create promises during render in client components
 function Component() {
-  const data = use(fetch('/api/data')); // ❌ recreates every render
+  const data = use(fetch('/api/data')) // ❌ recreates every render
 }
 // Pass stable promises from parent or use TanStack Query instead
 ```
@@ -126,8 +126,8 @@ function Component() {
 Wrap async components in Suspense for loading states and ErrorBoundary for errors:
 
 ```tsx
-import { Suspense } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+import { Suspense } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 
 function PostsPage() {
   return (
@@ -136,7 +136,7 @@ function PostsPage() {
         <PostsList />
       </Suspense>
     </ErrorBoundary>
-  );
+  )
 }
 ```
 
@@ -155,15 +155,15 @@ function PostsPage() {
 ### Prevent Fallback During Navigation with startTransition
 
 ```tsx
-import { startTransition, useTransition } from 'react';
+import { startTransition, useTransition } from 'react'
 
 function App() {
-  const [page, setPage] = useState('/');
-  const [isPending, startTransition] = useTransition();
+  const [page, setPage] = useState('/')
+  const [isPending, startTransition] = useTransition()
 
   function navigate(url: string) {
     // Keeps current content visible while loading, won't show fallback
-    startTransition(() => setPage(url));
+    startTransition(() => setPage(url))
   }
 
   return (
@@ -172,7 +172,7 @@ function App() {
         <PageContent page={page} />
       </Suspense>
     </div>
-  );
+  )
 }
 ```
 
@@ -190,21 +190,21 @@ function App() {
 ### useSuspenseQuery — data is always defined
 
 ```tsx
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 function PostsList() {
   // No need to check isLoading/error — handled by Suspense/ErrorBoundary
-  const { data } = useSuspenseQuery(postsQueryOptions());
+  const { data } = useSuspenseQuery(postsQueryOptions())
 
-  return data.map(post => <PostCard key={post.id} post={post} />);
+  return data.map(post => <PostCard key={post.id} post={post} />)
 }
 ```
 
 ### QueryErrorResetBoundary — retry after errors
 
 ```tsx
-import { QueryErrorResetBoundary } from '@tanstack/react-query';
-import { ErrorBoundary } from 'react-error-boundary';
+import { QueryErrorResetBoundary } from '@tanstack/react-query'
+import { ErrorBoundary } from 'react-error-boundary'
 
 function PostsPage() {
   return (
@@ -225,30 +225,30 @@ function PostsPage() {
         </ErrorBoundary>
       )}
     </QueryErrorResetBoundary>
-  );
+  )
 }
 ```
 
 ### Prefetch in Parent for Parallel Suspense Fetching
 
 ```tsx
-import { usePrefetchQuery } from '@tanstack/react-query';
+import { usePrefetchQuery } from '@tanstack/react-query'
 
 function ArticleLayout({ id }: { id: string }) {
   // Prefetch comments while article loads — fetches in parallel
-  usePrefetchQuery(articleCommentsQueryOptions(id));
+  usePrefetchQuery(articleCommentsQueryOptions(id))
 
   return (
     <Suspense fallback={<Skeleton />}>
       <Article id={id} />
     </Suspense>
-  );
+  )
 }
 
 function Article({ id }: { id: string }) {
-  const { data } = useSuspenseQuery(articleQueryOptions(id));
+  const { data } = useSuspenseQuery(articleQueryOptions(id))
   // Comments are likely already cached from prefetch
-  return <ArticleView article={data} />;
+  return <ArticleView article={data} />
 }
 ```
 
@@ -258,12 +258,12 @@ function Article({ id }: { id: string }) {
 
 ```tsx
 function PostsAdmin() {
-  const [page, setPage] = useState(1);
-  const [isPending, startTransition] = useTransition();
+  const [page, setPage] = useState(1)
+  const [isPending, startTransition] = useTransition()
 
   function goToPage(newPage: number) {
     // Wrap the state update — keeps current content visible, no fallback flash
-    startTransition(() => setPage(newPage));
+    startTransition(() => setPage(newPage))
   }
 
   return (
@@ -273,12 +273,12 @@ function PostsAdmin() {
       </Suspense>
       <Pagination page={page} onPageChange={goToPage} />
     </div>
-  );
+  )
 }
 
 function PostsTable({ page }: { page: number }) {
-  const { data } = useSuspenseQuery(postsQueryOptions({ page }));
-  return <DataTable data={data} />;
+  const { data } = useSuspenseQuery(postsQueryOptions({ page }))
+  return <DataTable data={data} />
 }
 ```
 
@@ -288,9 +288,9 @@ For search/filter inputs, use `useDeferredValue` — it lets the input update im
 
 ```tsx
 function SearchPage() {
-  const [query, setQuery] = useState('');
-  const deferredQuery = useDeferredValue(query);
-  const isStale = query !== deferredQuery;
+  const [query, setQuery] = useState('')
+  const deferredQuery = useDeferredValue(query)
+  const isStale = query !== deferredQuery
 
   return (
     <>
@@ -301,12 +301,12 @@ function SearchPage() {
         </div>
       </Suspense>
     </>
-  );
+  )
 }
 
 function SearchResults({ query }: { query: string }) {
-  const { data } = useSuspenseQuery(searchQueryOptions(query));
-  return <ResultsList results={data} />;
+  const { data } = useSuspenseQuery(searchQueryOptions(query))
+  return <ResultsList results={data} />
 }
 ```
 
@@ -326,7 +326,7 @@ function SearchResults({ query }: { query: string }) {
 const { data } = useSuspenseQuery({
   ...userQueryOptions(userId),
   enabled: !!userId, // ❌ not supported — use useQuery for conditional fetching
-});
+})
 
 // Never use placeholderData with useSuspenseQuery — intentionally removed
 // Use useTransition or useDeferredValue instead (see above)
@@ -337,7 +337,7 @@ const { data } = useSuspenseQuery({
 </Suspense>
 
 // Never change queryKey without transition — causes fallback flash
-setPage(newPage); // ❌ shows fallback — wrap in startTransition
+setPage(newPage) // ❌ shows fallback — wrap in startTransition
 ```
 
 ---
@@ -362,14 +362,14 @@ Routes live in `src/routes/`. The Vite plugin auto-generates `routeTree.gen.ts`.
 ### Route Definition
 
 ```tsx
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/posts/')({
   component: PostsPage,
-});
+})
 
 function PostsPage() {
-  return <div>Posts</div>;
+  return <div>Posts</div>
 }
 ```
 
@@ -382,7 +382,7 @@ export const Route = createFileRoute('/posts/')({
   pendingComponent: () => <div>Loading...</div>,
   errorComponent: ({ error }) => <div>Error: {error.message}</div>,
   component: PostsPage,
-});
+})
 ```
 
 Every route with a loader MUST define `pendingComponent` and `errorComponent`.
@@ -393,15 +393,15 @@ Every route with a loader MUST define `pendingComponent` and `errorComponent`.
 const searchSchema = z.object({
   page: z.number().default(1),
   search: z.string().optional(),
-});
+})
 
 export const Route = createFileRoute('/posts/')({
   validateSearch: searchSchema,
   component: PostsPage,
-});
+})
 
 function PostsPage() {
-  const { page, search } = Route.useSearch();
+  const { page, search } = Route.useSearch()
 }
 ```
 
@@ -412,8 +412,8 @@ function PostsPage() {
 <Link to="/posts/$postId" params={{ postId: '123' }}>View Post</Link>
 
 // Programmatic
-const navigate = useNavigate();
-navigate({ to: '/posts/$postId', params: { postId: '123' } });
+const navigate = useNavigate()
+navigate({ to: '/posts/$postId', params: { postId: '123' } })
 ```
 
 **DON'T:**
@@ -423,9 +423,9 @@ navigate({ to: '/posts/$postId', params: { postId: '123' } });
 // Never create route files outside src/routes/
 // Never use react-router-dom APIs — this is TanStack Router
 
-window.location.href = '/users'; // ❌ full page reload
+window.location.href = '/users' // ❌ full page reload
 <a href="/users">Users</a> // ❌ use <Link>
-const params = new URLSearchParams(window.location.search); // ❌ use validateSearch
+const params = new URLSearchParams(window.location.search) // ❌ use validateSearch
 <Link to={path as any} params={params as any} /> // ❌ fix the types
 ```
 
@@ -444,8 +444,8 @@ npx shadcn@latest add button card dialog input form table
 ### Using Components
 
 ```tsx
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 <Card>
   <CardHeader>
@@ -463,11 +463,11 @@ Build in `src/components/shared/` by composing shadcn primitives:
 
 ```tsx
 // src/components/shared/StatusBadge.tsx
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 
 interface StatusBadgeProps {
-  status: 'active' | 'inactive' | 'pending';
+  status: 'active' | 'inactive' | 'pending'
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {
@@ -478,7 +478,7 @@ export function StatusBadge({ status }: StatusBadgeProps) {
     >
       {status}
     </Badge>
-  );
+  )
 }
 ```
 
@@ -521,33 +521,33 @@ When building UI, ALWAYS invoke the **frontend-design** skill (`frontend-design:
 
 ```ts
 // src/features/auth/schemas/login-schema.ts
-import { z } from 'zod';
+import { z } from 'zod'
 
 export const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-});
+})
 
-export type LoginFormData = z.infer<typeof loginSchema>;
+export type LoginFormData = z.infer<typeof loginSchema>
 ```
 
 ### Form Component with shadcn
 
 ```tsx
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, type LoginFormData } from '@/features/auth/schemas/login-schema';
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { loginSchema, type LoginFormData } from '@/features/auth/schemas/login-schema'
 import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 export function LoginForm({ onSubmit }: { onSubmit: (data: LoginFormData) => void }) {
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
-  });
+  })
 
   return (
     <Form {...form}>
@@ -570,33 +570,33 @@ export function LoginForm({ onSubmit }: { onSubmit: (data: LoginFormData) => voi
         </Button>
       </form>
     </Form>
-  );
+  )
 }
 ```
 
 ### Wiring with TanStack Query Mutation
 
 ```tsx
-type ApiError = { message: string; field?: keyof LoginFormData };
+type ApiError = { message: string; field?: keyof LoginFormData }
 
 const loginMutation = useMutation({
   mutationFn: (data: LoginFormData) => api.post('/auth/login', data),
   onSuccess: () => { /* navigate, toast, etc. */ },
   onError: (error: ApiError) => {
     if (error.field) {
-      form.setError(error.field, { message: error.message });
+      form.setError(error.field, { message: error.message })
     } else {
-      form.setError('root', { message: error.message });
+      form.setError('root', { message: error.message })
     }
   },
-});
+})
 ```
 
 **DON'T:**
 
 ```tsx
 // Never duplicate types manually
-type LoginForm = { email: string; password: string }; // ❌ use z.infer<>
+type LoginForm = { email: string; password: string } // ❌ use z.infer<>
 
 // Never validate manually
 if (!data.email.includes('@')) { ... } // ❌ use Zod
@@ -615,7 +615,7 @@ if (!data.email.includes('@')) { ... } // ❌ use Zod
 ### Importing
 
 ```tsx
-import { Search, Plus, Trash2, ChevronRight } from 'lucide-react';
+import { Search, Plus, Trash2, ChevronRight } from 'lucide-react'
 ```
 
 ### Size Conventions
@@ -657,7 +657,7 @@ import { Search, Plus, Trash2, ChevronRight } from 'lucide-react';
 
 ```tsx
 // Never import all icons (kills tree-shaking)
-import * as Icons from 'lucide-react'; // ❌
+import * as Icons from 'lucide-react' // ❌
 
 // Never use raw SVGs when a Lucide icon exists
 <svg viewBox="0 0 24 24">...</svg> // ❌
