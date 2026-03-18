@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(git:*)",
+      "Bash(vitest:*)",
+      "Bash(npx vitest:*)",
+      "Bash(eslint:*)",
+      "Bash(npx eslint:*)",
+      "Bash(node:*)",
+      "Bash(tsc:*)",
+      "Bash(npx tsc:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath // empty' | { read -r f; case \"$f\" in */src/routes/*.tsx) grep -q 'createFileRoute' \"$f\" || echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"WARNING: Route file does not use createFileRoute. All route files in src/routes/ MUST export Route via createFileRoute. Fix this immediately.\"}}' ;; */features/*/queries/*.ts|*/features/*/queries/*.tsx) grep -q 'queryOptions' \"$f\" || echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"WARNING: Query file does not use queryOptions(). All query files in features/*/queries/ MUST use queryOptions() factory pattern. Fix this immediately.\"}}' ;; *.test.tsx|*.test.ts) grep -q '@testing-library/react' \"$f\" || echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"WARNING: Test file does not import from @testing-library/react. All component tests MUST use React Testing Library. Fix this immediately.\"}}' ;; esac; } 2>/dev/null || true",
+            "timeout": 10,
+            "statusMessage": "Validating conventions..."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 ---
 name: execute
 description: Execute an implementation plan by name. Usage - /execute <plan-name> (matches files in docs/superpowers/plans/)
-user_invocable: true
+user-invocable: true
 ---
 
 # Execute Plan
@@ -65,8 +65,11 @@ When all tasks are done:
 
 1. Run the final verification task (usually the last task in the plan)
 2. Update all remaining `- [ ]` to `- [x]` in the plan
-3. Tell the user:
+3. Tell the user, replacing `<plan-file>` with the actual plan filename:
 
 > "Plan execution complete. All N tasks finished.
 >
-> **Recommended next step:** Clear context and ask me to review the implementation against the spec for bugs, gaps, and improvements."
+> **Recommended next step:** Clear context and run:
+> ```
+> /review-spec @docs/superpowers/plans/<plan-file>
+> ```"
